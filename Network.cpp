@@ -2,27 +2,59 @@
 // Created by root on 22.11.15.
 //
 
-#include <pthread.h>
 #include "Network.h"
+std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
+
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
 void* Network::ClientLoop(void *arg){
-
-    /* block for connection request */
-
     int nClientSocket = *((int *) arg);
-    char buffer[50];
-    int n = 10;
-//        n = sprintf(buffer, "%s\n", asctime(local));
-//        n = sprintf(buffer, "%s\n", "helloziom");
+    int n = 1;
+    char buffer[n];
+    int n2 = 5;
+    char buffer2[n2] = "odpow";
     while (true) {
         int error = 0;
         socklen_t len = sizeof (error);
         int retval = getsockopt (nClientSocket, SOL_SOCKET, SO_ERROR, &error, &len);
         if(error!=0)break;
+//        read(nClientSocket, buffer, n);
+//        std::string string(buffer);
+//        std::vector<std::string> x = split(string,':');
+//        for (auto it = x.begin();  it != x.end() ; ++ it) {
+//            std::cout << *it << std::endl;
+//        }
+////        write(1, buffer, n);
+//        std::cout << "Size: " << x.size()  << std::endl;
 
-        read(nClientSocket, buffer, n);
-        write(1, buffer, n);
-        write(nClientSocket, buffer, n);
+        std::vector<std::string> x;
+        std::string string;
+        do{
+            read(nClientSocket, buffer, n);
+            if (buffer[0] == ':') {
+                x.push_back(string);
+                string.clear();
+                continue;
+            }
+            string+=buffer[0];
+        }while(buffer[0]!=';');
+        for (auto it = x.begin();  it != x.end() ; ++ it) {
+            std::cout << *it << std::endl;
+        }
+        std::cout << "Size: " << string  << std::endl;
+        write(nClientSocket, buffer2,n2);
     }
+    printf("close");
     close(nClientSocket);
     free(arg);
 }
@@ -74,4 +106,54 @@ void Network::SetServer(char *argv[]) {
 
     close(nSocket);
 
+}
+auto Network::Login(std::string name, std::string password) {
+    auto it = std::find_if(users.begin(),users.end(),[&name,&password](const  User& user){ return user.Login(name,password);});
+    return it;
+}
+
+void Network::Initialise() {
+    users.push_back(User(++userCount, "user", "12345"));
+    users.push_back(User(++userCount, "user2", "1234"));
+
+    //test
+    auto it = Login("user2", "1234");
+    if(it!=users.end()){
+        it->Show();
+    }
+    else{
+        std::cout << "lipa" << std::endl;
+    }
+    if (CreateAccount("user3", "123")) {
+        it = Login("user3", "123");
+        if(it!=users.end()){
+            it->Show();
+        }
+        else{
+            std::cout << "lipa" << std::endl;
+        }
+    }
+    else{
+        std::cout << "Nie zrobilo" << std::endl;
+    }
+    if (CreateAccount("user3", "123")) {
+        it = Login("user3", "123");
+        if(it!=users.end()){
+            it->Show();
+        }
+        else{
+            std::cout << "lipa" << std::endl;
+        }
+    }
+    else{
+        std::cout << "Nie zrobilo" << std::endl;
+    }
+
+}
+
+bool Network::CreateAccount(std::string name, std::string password) {
+    auto it = std::find_if(users.begin(),users.end(),[&name](const  User& user){ return user.CheckName(name);});
+    if(it!=users.end())return false;
+    users.push_back(User(++userCount, name, password));
+    return true;
 }

@@ -20,16 +20,34 @@
 
 #define SERVER_PORT 6067
 #define QUEUE_SIZE 5
+
+#include <string>
+#include <sstream>
+#include <vector>
+
+
+
+#include <pthread.h>
+#include <algorithm>
+#include <iostream>
+
+#include "User.h"
+static int eldo= 0;
 class Network {
     int nSocket;
     int nBind, nListen;
     int nFoo = 1;
     socklen_t nTmp;
     struct sockaddr_in stAddr, stClientAddr;
+    std::vector<User> users;
+    unsigned userCount = 0;
 
 public:
     static void*ClientLoop(void *arg);
     void SetServer(char *argv[]);
+    void Initialise();
+    auto Login(std::string name, std::string password);
+    bool CreateAccount(std::string name, std::string password);
 
 };
 
