@@ -6,17 +6,48 @@
 #define TEST_CLASH_H
 
 #include <vector>
+#include <array>
+#include <functional>
+#include <memory>
+
+
 #include "User.h"
 
 class Clash {
-    int hp;
+public:
+    Clash(const std::shared_ptr<User> &user1,const std::shared_ptr<User> &user2) {
+        users.at(0)=user1;
+        users.at(1)=user2;
+        turn[0] = false;
+        turn[1] = false;
+        hp1 = user1->getHp();
+        hp2 = user2->getHp();
+        mp1 = user1->getMp();
+        mp2 = user2->getMp();
+
+    }
+    void ActiveTurn(const std::shared_ptr<User> &user);
+    void Attack(const std::shared_ptr<User> &user,int newHp);
+    void SetMp(const std::shared_ptr<User> &user,int newMp);
+    void IncreaseTurn();
+    void LoadData();
+    bool CheckTurn(int userTurn);
+
+    void ShowName(){
+        std::cout << "Clash" << std::endl;
+        users.at(0)->Show();
+        users.at(1)->Show();
+        std::cout << turnCount << std::endl;
+        std::cout << "End" << std::endl;
+    }
+private:
+    int hp1;
     int hp2;
     int mp1;
     int mp2;
-    User * user;
-    User * user2;
-    std::vector<bool> turn;
-    std::vector<bool> turn2;
+    std::array<std::shared_ptr<User>,2> users;
+    std::array<bool,2> turn;
+    int turnCount;
 };
 
 

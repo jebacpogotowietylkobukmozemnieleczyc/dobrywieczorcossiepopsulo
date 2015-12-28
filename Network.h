@@ -30,8 +30,12 @@
 #include <pthread.h>
 #include <algorithm>
 #include <iostream>
+#include <memory>
 
 #include "User.h"
+#include "Clash.h"
+#include "Challenge.h"
+
 static int eldo= 0;
 class Network {
     int nSocket;
@@ -39,7 +43,9 @@ class Network {
     int nFoo = 1;
     socklen_t nTmp;
     struct sockaddr_in stAddr, stClientAddr;
-    std::vector<User> users;
+    std::vector<std::shared_ptr<User>> users;
+    std::vector<Clash> clashes;
+    std::vector<Challenge> challenges;
     unsigned userCount = 0;
 
 public:
@@ -48,6 +54,13 @@ public:
     void Initialise();
     auto Login(std::string name, std::string password);
     bool CreateAccount(std::string name, std::string password);
+    void getReady();
+    bool AddChallenge(const std::shared_ptr<User> &user,std::string name);
+    void SendChallange();
+    bool CheckChallenge(const std::shared_ptr<User> &user, std::string name);
+    void AnswerChallange();
+    void TakeChallenge(const std::shared_ptr<User> &user, std::string name);
+    void DeclineChallenge(const std::shared_ptr<User> &user, std::string name);
 
 };
 

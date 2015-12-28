@@ -1,5 +1,48 @@
-//
-// Created by klimas on 28.11.15.
-//
-
 #include "Clash.h"
+
+void Clash::IncreaseTurn() {
+    ++turnCount;
+    turn[0]= false;
+    turn[1]= false;
+}
+
+void Clash::ActiveTurn(const std::shared_ptr<User> &user) {
+    if(users[0]==user)turn[0]=true;
+    else if(users[1]==user)turn[1]=true;
+    if(turn[0] && turn[1])IncreaseTurn();
+}
+
+void Clash::LoadData() {
+    std::cout << "Hp1: " << hp1 << "Hp2: " << hp2 << "Mp1: " << mp1 <<"Mp2: " << mp2 << std::endl;
+
+}
+
+bool Clash::CheckTurn(int userTurn) {
+    if(turnCount>userTurn)return true;
+    return false;
+}
+
+void Clash::Attack(const std::shared_ptr<User> &user, int newHp) {
+    if(users[0]==user){
+        if(turn[0])
+            return;
+        hp2= newHp;
+        turn[0]=true;
+    }
+    else if(users[1]==user){
+        if(turn[1])
+            return;
+        hp1= newHp;
+        turn[1]=true;
+    }
+    if(turn[0] && turn[1])IncreaseTurn();
+}
+
+void Clash::SetMp(const std::shared_ptr<User> &user,int newMp) {
+    if(users[0]==user){
+        mp1= newMp;
+    }
+    else if(users[1]==user){
+        mp2= newMp;
+    }
+}

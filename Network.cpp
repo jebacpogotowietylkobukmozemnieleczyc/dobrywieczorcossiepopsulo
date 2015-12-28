@@ -108,52 +108,151 @@ void Network::SetServer(char *argv[]) {
 
 }
 auto Network::Login(std::string name, std::string password) {
-    auto it = std::find_if(users.begin(),users.end(),[&name,&password](const  User& user){ return user.Login(name,password);});
+    auto it = std::find_if(users.begin(),users.end(),[&name,&password](const  std::shared_ptr<User>& user){ return user->Login(name,password);});
+    if(it!=users.end()){
+        (*it)->setLogged(true);
+    }
     return it;
 }
 
 void Network::Initialise() {
-    users.push_back(User(++userCount, "user", "12345"));
-    users.push_back(User(++userCount, "user2", "1234"));
+    users.push_back(std::shared_ptr<User>(new User(++userCount, "user", "12345")));
+    users.push_back(std::shared_ptr<User>(new User(++userCount, "user2", "1234")));
 
     //test
-    auto it = Login("user2", "1234");
+
+    auto it = Login("user", "12345");
     if(it!=users.end()){
-        it->Show();
+        (*it)->Show();
     }
     else{
         std::cout << "lipa" << std::endl;
     }
-    if (CreateAccount("user3", "123")) {
-        it = Login("user3", "123");
-        if(it!=users.end()){
-            it->Show();
-        }
-        else{
-            std::cout << "lipa" << std::endl;
-        }
+
+    auto it2 = Login("user2", "1234");
+    if(it2!=users.end()){
+        (*it2)->Show();
     }
     else{
-        std::cout << "Nie zrobilo" << std::endl;
+        std::cout << "lipa2" << std::endl;
     }
-    if (CreateAccount("user3", "123")) {
-        it = Login("user3", "123");
-        if(it!=users.end()){
-            it->Show();
-        }
-        else{
-            std::cout << "lipa" << std::endl;
-        }
-    }
-    else{
-        std::cout << "Nie zrobilo" << std::endl;
-    }
+    (*it2)->setReady();
+
+    AddChallenge(*it,"user2");
+    AddChallenge(*it,"user2");
+    TakeChallenge(*it2,"user");
+    //todo block
+    int clashid = clashes.size()-1;
+
+    clashes.at(clashid).Attack(*it,10);
+    clashes.at(clashid).Attack(*it,30);
+    clashes.at(clashid).SetMp(*it,12);
+    clashes.at(clashid).SetMp(*it,62);
+    clashes.at(clashid).SetMp(*it,72);
+    clashes.at(clashid).ShowName();
+    clashes.at(clashid).Attack(*it2,10);
+    clashes.at(clashid).Attack(*it2,30);
+    clashes.at(clashid).Attack(*it2,50);
+    clashes.at(clashid).Attack(*it,55);
+    clashes.at(clashid).SetMp(*it,902);
+    clashes.at(clashid).SetMp(*it2,3372);
+    clashes.at(clashid).ShowName();
+
+    (*it)->Win();
+    (*it2)->Lose();
+
+
+
+//    clashes.push_back(Clash((*it),users.at(1)));
+//    clashes.at(0).ShowName();
+//    getReady();
+//    (*it)->setReady();
+//    getReady();
+//    (*it)->Logout();
+//    getReady();
+//    it = Login("user2", "1234");
+//    if(it!=users.end()){
+//        (*it)->Show();
+//    }
+//    else{
+//        std::cout << "lipa2" << std::endl;
+//    }
+//    if (CreateAccount("user3", "123")) {
+//        it = Login("user3", "123");
+//        if(it!=users.end()){
+//            (*it)->Show();
+//        }
+//        else{
+//            std::cout << "lipa" << std::endl;
+//        }
+//    }
+//    else{
+//        std::cout << "Nie zrobilo" << std::endl;
+//    }
+//    if (CreateAccount("user3", "123")) {
+//        it = Login("user3", "123");
+//        if(it!=users.end()){
+//            (*it)->Show();
+//        }
+//        else{
+//            std::cout << "lipa" << std::endl;
+//        }
+//    }
+//    else{
+//        std::cout << "Nie zrobilo" << std::endl;
+//    }
 
 }
 
 bool Network::CreateAccount(std::string name, std::string password) {
-    auto it = std::find_if(users.begin(),users.end(),[&name](const  User& user){ return user.CheckName(name);});
+    auto it = std::find_if(users.begin(),users.end(),[&name](const  std::shared_ptr<User>& user){ return user->CheckName(name);});
     if(it!=users.end())return false;
-    users.push_back(User(++userCount, name, password));
+    users.push_back(std::shared_ptr<User>(new User(++userCount,name, password)));
     return true;
+}
+
+void Network::getReady() {
+    std::vector<std::shared_ptr<User>> readyUsers;
+    std::copy_if(users.begin(),users.end(),std::back_inserter(readyUsers),[](const  std::shared_ptr<User>& user){return user->isReady();});
+    std::cout << "Ready Users" << std::endl;
+    for (std::shared_ptr<User>user :readyUsers) {
+        user->Show();
+
+    }
+    std::cout << "End " << std::endl;
+}
+
+bool Network::AddChallenge(const std::shared_ptr<User> &user,std::string name) {
+    auto it = std::find_if(users.begin(),users.end(),[&name](const  std::shared_ptr<User>& user){ return user->CheckName(name) && user->isReady();});
+    if(it==users.end())return false;
+    Challenge challenge(user,(*it));
+    if(std::find(challenges.begin(),challenges.end(),challenge)!=challenges.end())return false;
+    challenges.push_back(Challenge(user,(*it)));
+    std::cout << "Add Challange" << std::endl;
+    return true;
+    //todo sendChallange
+}
+
+bool Network::CheckChallenge(const std::shared_ptr<User> &user, std::string name) {
+    auto it = std::find_if(users.begin(),users.end(),[&name](const  std::shared_ptr<User>& user){ return user->CheckName(name) ;});
+    if(it==users.end())return false;
+    Challenge challenge((*it),user);
+    if(std::find(challenges.begin(),challenges.end(),challenge)==challenges.end())return false;
+    challenges.erase(std::remove(challenges.begin(),challenges.end(),challenge),challenges.end());
+    return  true;
+}
+
+void Network::TakeChallenge(const std::shared_ptr<User> &user, std::string name) {
+    if(!CheckChallenge(user,name))return;
+    std::cout << "Take Challange" << std::endl;
+    auto it = std::find_if(users.begin(),users.end(),[&name](const  std::shared_ptr<User>& user){ return user->CheckName(name) ;});
+    if(it==users.end())return;
+    clashes.push_back(Clash((*it), user));
+    clashes.at(0).ShowName();
+    //todo anserChallange
+}
+
+void Network::DeclineChallenge(const std::shared_ptr<User> &user, std::string name) {
+    if(!CheckChallenge(user,name))return;
+    std::cout << "Decline Challange" << std::endl;
 }

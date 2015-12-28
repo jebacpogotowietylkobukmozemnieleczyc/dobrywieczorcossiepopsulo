@@ -5,9 +5,12 @@
 #include "User.h"
 
 bool User::Login(std::string name_, std::string password_)const {
-    if(name_==name && password_==password)return true;
+    if(name_==name && password_==password && !logged){
+        return true;
+    }
     return false;
 }
+
 
 bool User::CheckName(std::string name_) const {
     if(name_==name)return true;
@@ -39,4 +42,15 @@ bool User::AddSkill(int type) {
     ++skill[type];
 }
 
+
+void User::Win() {
+    ++wins;
+    gold+=100;
+    exp+=100;
+    if(exp>1000){
+       ++level;
+        skillPoints+=5;
+        exp=0;
+    }
+}
 

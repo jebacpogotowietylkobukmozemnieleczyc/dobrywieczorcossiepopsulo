@@ -3,6 +3,6 @@ project(test)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wall")
 
-set(SOURCE_FILES main.cpp Network.cpp Network.h User.cpp User.h Clash.cpp Clash.h)
+set(SOURCE_FILES main.cpp Network.cpp Network.h User.cpp User.h Clash.cpp Clash.h Challenge.cpp Challenge.h)
 add_executable(test ${SOURCE_FILES})
 TARGET_LINK_LIBRARIES(test pthread)
