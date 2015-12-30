@@ -30,6 +30,11 @@ bool User::DeleteItem(int id) {
     return false;
 }
 
+void User::SellItem(int id, int prize) {
+    if(!DeleteItem(id))return;
+    gold+=prize;
+}
+
 void User::Use(int id) {
     auto it =  std::find(use.begin(), use.end(), id);
     if (it != use.end())use.erase(it);
@@ -54,3 +59,31 @@ void User::Win() {
     }
 }
 
+std::string User::LoadUser() {
+//    return std::basic_string<char, char_traits < _CharT>, allocator < _CharT >> ();
+    return  "du:" + name + ":" + std::to_string(level) + ":" + std::to_string(gold) + ":" + std::to_string(skillPoints)
+            +":" + std::to_string(skill[0]) + ":"+ std::to_string(skill[1]) + ":"+ std::to_string(skill[2]) + ":"
+            + std::to_string(skill[3]) + ":"+ std::to_string(wins)+ ":"+ std::to_string(loss) + ":"+ std::to_string(exp) +";";
+}
+
+std::string User::LoadHave() {
+    std::string s = std::accumulate(std::begin(have), std::end(have), std::string{},
+                                    [](const std::string& a, int b) {
+                                        return a.empty() ? std::to_string(b)
+                                                         : a + ':' + std::to_string(b);
+                                    });
+    return "dh:" + s + ";";
+}
+
+std::string User::LoadUse() {
+    std::string s = std::accumulate(std::begin(use), std::end(use), std::string{},
+                                    [](const std::string& a, int b) {
+                                        return a.empty() ? std::to_string(b)
+                                                         : a + ':' + std::to_string(b);
+                                    });
+    return "du:" + s + ";";
+}
+
+std::string User::LoadInfo() {
+    return   name + ":" + std::to_string(level) + ":" + std::to_string(wins) + ":" + std::to_string(loss);
+}

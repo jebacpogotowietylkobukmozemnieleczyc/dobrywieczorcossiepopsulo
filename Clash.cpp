@@ -12,8 +12,9 @@ void Clash::ActiveTurn(const std::shared_ptr<User> &user) {
     if(turn[0] && turn[1])IncreaseTurn();
 }
 
-void Clash::LoadData() {
-    std::cout << "Hp1: " << hp1 << "Hp2: " << hp2 << "Mp1: " << mp1 <<"Mp2: " << mp2 << std::endl;
+std::string Clash::LoadData() {
+//    std::cout << "Hp1: " << hp1 << "Hp2: " << hp2 << "Mp1: " << mp1 <<"Mp2: " << mp2 << std::endl;
+    return  "dc:" + std::to_string(hp1) + ":" + std::to_string(hp2) + ":" + std::to_string(mp1) +":" + std::to_string(mp2) + ";";
 
 }
 
@@ -45,4 +46,8 @@ void Clash::SetMp(const std::shared_ptr<User> &user,int newMp) {
     else if(users[1]==user){
         mp2= newMp;
     }
+}
+
+bool Clash::IsExist(const std::shared_ptr<User> &user) const {
+    return user==users[0];
 }

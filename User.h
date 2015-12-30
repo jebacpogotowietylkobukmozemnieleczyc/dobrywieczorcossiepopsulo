@@ -28,6 +28,7 @@ public:
     void AddItem(int id);
     void Use(int);
     bool DeleteItem(int id);
+    void SellItem(int id,int prize);
 
     //Skill
     bool AddSkill(int type);
@@ -65,9 +66,22 @@ public:
         return ready;
     }
 
+    unsigned long getClashId() const {
+        return clashId;
+    }
+
+    void setClashId(unsigned long clashId) {
+        User::clashId = clashId;
+    }
+
+    std::string LoadUser();
+    std::string LoadHave();
+    std::string LoadUse();
+    std::string LoadInfo();
 
 private:
     int id;
+    unsigned long clashId;
     std::string name;
     std::string password;
     int gold;

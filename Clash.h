@@ -16,10 +16,12 @@
 class Clash {
 public:
     Clash(const std::shared_ptr<User> &user1,const std::shared_ptr<User> &user2) {
+        //todo initialization list
         users.at(0)=user1;
         users.at(1)=user2;
         turn[0] = false;
         turn[1] = false;
+        turnCount=0;
         hp1 = user1->getHp();
         hp2 = user2->getHp();
         mp1 = user1->getMp();
@@ -30,8 +32,9 @@ public:
     void Attack(const std::shared_ptr<User> &user,int newHp);
     void SetMp(const std::shared_ptr<User> &user,int newMp);
     void IncreaseTurn();
-    void LoadData();
+    std::string LoadData();
     bool CheckTurn(int userTurn);
+    bool IsExist(const std::shared_ptr<User> &user) const;
 
     void ShowName(){
         std::cout << "Clash" << std::endl;
