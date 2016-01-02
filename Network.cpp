@@ -21,8 +21,8 @@ void* Network::ClientLoop(void *arg){
     int nClientSocket = *((int *) arg);
     int n = 1;
     char buffer[n];
-    int n2 = 5;
-    char buffer2[n2] = "odpow";
+    int n2 = 31;
+    char buffer2[n2] = "du:user:1:100:0:2:2:2:2:1:0:0;";
     while (true) {
         int error = 0;
         socklen_t len = sizeof (error);
@@ -48,6 +48,13 @@ void* Network::ClientLoop(void *arg){
             }
             string+=buffer[0];
         }while(buffer[0]!=';');
+    try {
+        callbackMap.at("lo")(x);
+    }
+    catch(const std::out_of_range&){
+        std::cout << "juz jest ciemno" << std::endl;
+    }
+
         for (auto it = x.begin();  it != x.end() ; ++ it) {
             std::cout << *it << std::endl;
         }
@@ -172,84 +179,84 @@ void Network::Initialise() {
     x.push_back("user");
     x.push_back("12345");
     callbackMap.at("si")(it,x);
-    if(it!=users.end()){
-        (*it)->Show();
-    }
-    else{
-        std::cout << "lipa" << std::endl;
-    }
-
-    x.clear();
-    x.push_back("user2");
-    x.push_back("1234");
-//    callbackMap.at("lo")(it,x);
-    callbackMap.at("si")(it2,x);
+//    if(it!=users.end()){
+//        (*it)->Show();
+//    }
+//    else{
+//        std::cout << "lipa" << std::endl;
+//    }
+//
+//    x.clear();
+//    x.push_back("user2");
+//    x.push_back("1234");
+////    callbackMap.at("lo")(it,x);
 //    callbackMap.at("si")(it2,x);
-    if(it2!=users.end()){
-        (*it2)->Show();
-    }
-    else{
-        std::cout << "lipa2" << std::endl;
-    }
-
-
-    (*it2)->AddItem(4);
-    x.clear();
-    x.push_back("4");
-    callbackMap.at("ui")(it2,x);
-    std::cout << "check" << std::endl;
-
-    x.clear();
-    x.push_back("4");
-    x.push_back("150");
-    callbackMap.at("sl")(it2,x);
-    std::cout << "check2" << std::endl;
-
-    callbackMap.at("sr")(it2,x);
-    x.clear();
-    x.push_back("user2");
-    callbackMap.at("ac")(it,x);
-    callbackMap.at("ac")(it,x);
-    x.clear();
-    x.push_back("user");
-    callbackMap.at("tc")(it2,x);
-    callbackMap.at("tc")(it2,x);
-
-    x.clear();
-    x.push_back("593");
-    callbackMap.at("at")(it,x);
-    x.clear();
-    x.push_back("123123");
-    callbackMap.at("at")(it,x);
-    callbackMap.at("sm")(it,x);
-    x.clear();
-    x.push_back("908");
-    callbackMap.at("sm")(it,x);
-    callbackMap.at("ar")(it2,x);
-    callbackMap.at("at")(it2,x);
-    callbackMap.at("ar")(it,x);
-
-    callbackMap.at("wn")(it,x);
-    callbackMap.at("ls")(it2,x);
-
-    callbackMap.at("sr")(it,x);
-    x.clear();
-    x.push_back("user");
-    callbackMap.at("ac")(it2,x);
-    x.clear();
-    x.push_back("user2");
-    callbackMap.at("tc")(it,x);
-
-    std::cout << "check3 " << (*it)->getClashId() << " " << (*it2)->getClashId() <<std::endl;
-    std::cout << getReady() << std::endl;
-
+////    callbackMap.at("si")(it2,x);
+//    if(it2!=users.end()){
+//        (*it2)->Show();
+//    }
+//    else{
+//        std::cout << "lipa2" << std::endl;
+//    }
+//
+//
+//    (*it2)->AddItem(4);
+//    x.clear();
+//    x.push_back("4");
+//    callbackMap.at("ui")(it2,x);
+//    std::cout << "check" << std::endl;
+//
+//    x.clear();
+//    x.push_back("4");
+//    x.push_back("150");
+//    callbackMap.at("sl")(it2,x);
+//    std::cout << "check2" << std::endl;
+//
+//    callbackMap.at("sr")(it2,x);
+//    x.clear();
+//    x.push_back("user2");
+//    callbackMap.at("ac")(it,x);
+//    callbackMap.at("ac")(it,x);
+//    x.clear();
+//    x.push_back("user");
+//    callbackMap.at("tc")(it2,x);
+//    callbackMap.at("tc")(it2,x);
+//
+//    x.clear();
+//    x.push_back("593");
+//    callbackMap.at("at")(it,x);
+//    x.clear();
+//    x.push_back("123123");
+//    callbackMap.at("at")(it,x);
+//    callbackMap.at("sm")(it,x);
+//    x.clear();
+//    x.push_back("908");
+//    callbackMap.at("sm")(it,x);
+//    callbackMap.at("ar")(it2,x);
+//    callbackMap.at("at")(it2,x);
+//    callbackMap.at("ar")(it,x);
+//
+//    callbackMap.at("wn")(it,x);
+//    callbackMap.at("ls")(it2,x);
+//
+//    callbackMap.at("sr")(it,x);
+//    x.clear();
+//    x.push_back("user");
+//    callbackMap.at("ac")(it2,x);
+//    x.clear();
+//    x.push_back("user2");
+//    callbackMap.at("tc")(it,x);
+//
+//    std::cout << "check3 " << (*it)->getClashId() << " " << (*it2)->getClashId() <<std::endl;
+//    std::cout << getReady() << std::endl;
+//
     std::cout << "check2 "  << (*it)->LoadUser() <<std::endl;
-
-
-    std::cout << "check2" <<(*it)->LoadHave()<< std::endl;
-
-
-    std::cout << "check2" <<(*it)->LoadUse()<< std::endl;
+//
+//
+//    std::cout << "check2" <<(*it)->LoadHave()<< std::endl;
+//
+//
+//    std::cout << "check2" <<(*it)->LoadUse()<< std::endl;
 
 
     std::cout << "check2" << std::endl;
