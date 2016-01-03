@@ -17,16 +17,18 @@ std::vector<std::string> split(const std::string &s, char delim) {
     split(s, delim, elems);
     return elems;
 }
-void* Network::ClientLoop(void *arg){
-    int nClientSocket = *((int *) arg);
+void* Network::ClientLoop(int *arg){
+//    int nClientSocket = *((int *) arg);
+    int nClientSocket = *(arg);
     int n = 1;
     char buffer[n];
-    int n2 = 31;
-    char buffer2[n2] = "du:user:1:100:0:2:2:2:2:1:0:0;";
+//    int n2 = 31;
+//    char buffer2[n2] = "du:user:1:100:0:2:2:2:2:1:0:0;";
+    std::vector<std::shared_ptr<User> >::iterator user;
     while (true) {
         int error = 0;
         socklen_t len = sizeof (error);
-        int retval = getsockopt (nClientSocket, SOL_SOCKET, SO_ERROR, &error, &len);
+         getsockopt (nClientSocket, SOL_SOCKET, SO_ERROR, &error, &len);
         if(error!=0)break;
 //        read(nClientSocket, buffer, n);
 //        std::string string(buffer);
@@ -48,8 +50,26 @@ void* Network::ClientLoop(void *arg){
             }
             string+=buffer[0];
         }while(buffer[0]!=';');
+
+        std::string fn = x.at(1);
+        std::string odp;
+        std::vector<decltype(x)::value_type>(x.begin()+2, x.end()).swap(x);
+//        x.erase(x.begin(), x.begin() + 2);
     try {
-        callbackMap.at("lo")(x);
+
+        std::cout << fn << std::endl;
+         odp = callbackMap.at(fn)(user,x);
+//        for(std::string str :x)std::cout << str << std::endl;
+//        x.clear();
+//    x.push_back("user");
+//    x.push_back("12345");
+//    callbackMap.at("si")(user,x);
+//    if(user!=users.end()){
+//        (*user)->Show();
+//    }
+//    else{
+//        std::cout << "lipa" << std::endl;
+//    }
     }
     catch(const std::out_of_range&){
         std::cout << "juz jest ciemno" << std::endl;
@@ -58,12 +78,14 @@ void* Network::ClientLoop(void *arg){
         for (auto it = x.begin();  it != x.end() ; ++ it) {
             std::cout << *it << std::endl;
         }
-        std::cout << "Size: " << string  << std::endl;
-        write(nClientSocket, buffer2,n2);
+        (*user)->Show();
+        std::cout << "Size: " << odp  << std::endl;
+        write(nClientSocket, odp.c_str(),odp.size());
     }
     printf("close");
     close(nClientSocket);
     free(arg);
+    return NULL;
 }
 
 void Network::SetServer(char *argv[]) {
@@ -107,14 +129,23 @@ void Network::SetServer(char *argv[]) {
         printf("%s: [connection from %s]\n",
                argv[0], inet_ntoa((struct in_addr)stClientAddr.sin_addr));
 
-        pthread_create(&id, NULL, ClientLoop, (void *) nClientSocket);
+
+        threadArgs.network = this;
+        threadArgs.nClientSocket = nClientSocket;
+        pthread_create(&id, NULL, &Network::ClientLoopStatic,&threadArgs);
+//        pthread_create(&id, NULL, ClientLoop, (void *) nClientSocket);
+
 
     }
 
     close(nSocket);
 
 }
-std::vector<std::shared_ptr<User> >::iterator& Network::Login(std::string name, std::string password) {
+void *Network::ClientLoopStatic(void *arg) {
+     ThreadArgs *threadArgs= (ThreadArgs*)arg;
+    return (threadArgs->network)->ClientLoop(threadArgs->nClientSocket);
+}
+std::vector<std::shared_ptr<User> >::iterator Network::Login(std::string name, std::string password) {
     auto it = std::find_if(users.begin(),users.end(),[&name,&password](const  std::shared_ptr<User>& user){ return user->Login(name,password);});
     if(it!=users.end()){
         (*it)->setLogged(true);
@@ -168,17 +199,17 @@ void Network::Initialise() {
 
 
 //    auto it = Login("user", "12345");
-    std::vector<std::shared_ptr<User> >::iterator it;
-    std::vector<std::shared_ptr<User> >::iterator it2;
+//    std::vector<std::shared_ptr<User> >::iterator it;
+//    std::vector<std::shared_ptr<User> >::iterator it2;
 //    std::shared_ptr<User> it;
 //    std::shared_ptr<User> it2;
-    std::vector<std::string> x;
+//    std::vector<std::string> x;
 //    auto sm = [&it,&x](){callbackMap.at("lo")(it,x);};
 
 
-    x.push_back("user");
-    x.push_back("12345");
-    callbackMap.at("si")(it,x);
+//    x.push_back("user");
+//    x.push_back("12345");
+//    callbackMap.at("si")(it,x);
 //    if(it!=users.end()){
 //        (*it)->Show();
 //    }
@@ -250,7 +281,7 @@ void Network::Initialise() {
 //    std::cout << "check3 " << (*it)->getClashId() << " " << (*it2)->getClashId() <<std::endl;
 //    std::cout << getReady() << std::endl;
 //
-    std::cout << "check2 "  << (*it)->LoadUser() <<std::endl;
+//    std::cout << "check2 "  << (*it)->LoadUser() <<std::endl;
 //
 //
 //    std::cout << "check2" <<(*it)->LoadHave()<< std::endl;
@@ -339,15 +370,15 @@ bool Network::CreateAccount(std::string name, std::string password) {
     return true;
 }
 
-std::string Network::getReady() {
+std::string Network::getReady(std::vector<std::shared_ptr<User> >::iterator &user) {
     std::vector<std::shared_ptr<User>> readyUsers;
-    std::copy_if(users.begin(),users.end(),std::back_inserter(readyUsers),[](const  std::shared_ptr<User>& user){return user->isReady();});
+    std::copy_if(users.begin(),users.end(),std::back_inserter(readyUsers),[&user](const  std::shared_ptr<User>& tuser){return tuser->isReady() && (*user)!=tuser;});
         std::string s = std::accumulate(std::begin(readyUsers), std::end(readyUsers), std::string{},
                                         [](const std::string& a,const  std::shared_ptr<User>& user ) {
                                             return a.empty() ? user->LoadInfo()
                                                              : a + ':' + user->LoadInfo();
                                         });
-        return "du:" + s + ";";
+        return "dr:" + s + ";";
 }
 
 bool Network::AddChallenge(std::vector<std::shared_ptr<User> >::iterator &user,std::string name) {
@@ -395,3 +426,4 @@ void Network::DeleteClash(std::vector<std::shared_ptr<User> >::iterator &user) {
             std::remove_if(clashes.begin(), clashes.end(), [&user](const Clash &clash) { return clash.IsExist((*user)); }),
             clashes.end());
 }
+

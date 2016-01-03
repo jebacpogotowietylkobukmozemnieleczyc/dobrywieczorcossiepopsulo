@@ -30,9 +30,10 @@ bool User::DeleteItem(int id) {
     return false;
 }
 
-void User::SellItem(int id, int prize) {
-    if(!DeleteItem(id))return;
+bool User::SellItem(int id, int prize) {
+    if(!DeleteItem(id))return false;
     gold+=prize;
+    return true;
 }
 
 void User::Use(int id) {
@@ -45,6 +46,7 @@ bool User::AddSkill(int type) {
     if(skillPoints<=0) return false;
     --skillPoints;
     ++skill[type];
+    return true;
 }
 
 
@@ -52,7 +54,7 @@ void User::Win() {
     ++wins;
     gold+=100;
     exp+=100;
-    if(exp>1000){
+    if(exp>=1000){
        ++level;
         skillPoints+=5;
         exp=0;
@@ -81,7 +83,7 @@ std::string User::LoadUse() {
                                         return a.empty() ? std::to_string(b)
                                                          : a + ':' + std::to_string(b);
                                     });
-    return "du:" + s + ";";
+    return "di:" + s + ";";
 }
 
 std::string User::LoadInfo() {

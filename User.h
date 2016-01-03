@@ -28,7 +28,7 @@ public:
     void AddItem(int id);
     void Use(int);
     bool DeleteItem(int id);
-    void SellItem(int id,int prize);
+    bool SellItem(int id,int prize);
 
     //Skill
     bool AddSkill(int type);

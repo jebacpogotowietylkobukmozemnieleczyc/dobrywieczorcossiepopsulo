@@ -36,9 +36,15 @@
 #include "Clash.h"
 #include "Challenge.h"
 
-static int eldo = 0;
+class Network;
+struct ThreadArgs {
+    Network * network;
+    int * nClientSocket;
+
+};
 
 class Network {
+    ThreadArgs threadArgs;
     int nSocket;
     int nBind, nListen;
     int nFoo = 1;
@@ -49,36 +55,41 @@ class Network {
     std::vector<Challenge> challenges;
     unsigned userCount = 0;
 
-    std::map<std::string, std::function<void(std::vector<std::shared_ptr<User> >::iterator  &user,const std::vector<std::string> &x)> > callbackMap;
+    std::map<std::string, std::function<std::string(std::vector<std::shared_ptr<User> >::iterator  &user,const std::vector<std::string> &x)> > callbackMap;
 
 public:
-    Network() : callbackMap({{"si", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { user = Login(x.at(0),x.at(1)); }},
-                             {"ac", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {AddChallenge(user,x.at(0));}},
-                             {"tc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {TakeChallenge(user,x.at(0));}},
-                             {"dc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {DeclineChallenge(user,x.at(0));}},
-                             {"at", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).Attack((*user),std::stoi(x.at(0)));}},
-                             {"sm", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).SetMp((*user),std::stoi(x.at(0)));}},
-                             {"ar", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).ActiveTurn((*user));}},
-                             {"ls", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Lose();DeleteClash(user);}},
-                             {"wn", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Win();DeleteClash(user);}},
-                             {"lo", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Logout();}},
-                             {"sl", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->SellItem(std::stoi(x.at(0)),std::stoi(x.at(1)));}},
-                             {"ui", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Use(std::stoi(x.at(0)));}},
-                             {"di", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->DeleteItem(std::stoi(x.at(0)));}},
-                             {"sr", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->setReady();}}
+    Network() : callbackMap({{"si", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { user = Login(x.at(0),x.at(1));if(user!=users.end())return "yes;";return "no;"; }},
+                             {"ac", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {AddChallenge(user,x.at(0));return "yes;";}},
+                             {"tc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {TakeChallenge(user,x.at(0));return "yes;";}},
+                             {"dc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {DeclineChallenge(user,x.at(0));return "yes;";}},
+                             {"at", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).Attack((*user),std::stoi(x.at(0)));return "yes;";}},
+                             {"sm", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).SetMp((*user),std::stoi(x.at(0)));return "yes;";}},
+                             {"ar", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).ActiveTurn((*user));return "yes;";}},
+                             {"ls", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Lose();DeleteClash(user);return "yes;";}},
+                             {"wn", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Win();DeleteClash(user);return "yes;";}},
+                             {"lo", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Logout();return "yes;";}},
+                             {"sl", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if((*user)->SellItem(std::stoi(x.at(0)),std::stoi(x.at(1))))return "yes;";return "no;";}},
+                             {"ui", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Use(std::stoi(x.at(0)));return "yes;";}},
+                             {"di", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if((*user)->DeleteItem(std::stoi(x.at(0))))return "yes;";return "no;";}},
+                             {"sr", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->setReady();return "yes";}},
+                                    {"lu", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return (*user)->LoadUser();}},
+                             {"lh", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return (*user)->LoadHave();}},
+                             {"li", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return (*user)->LoadUse();}},
+                             {"lr", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return getReady(user);}}
                              }) { }
 
-    static void *ClientLoop(void *arg);
+     void *ClientLoop(int * arg);
+    static void *ClientLoopStatic(void *arg);
 
     void SetServer(char *argv[]);
 
     void Initialise();
 
-    std::vector<std::shared_ptr<User> >::iterator& Login(std::string name, std::string password);
+    std::vector<std::shared_ptr<User> >::iterator Login(std::string name, std::string password);
 
     bool CreateAccount(std::string name, std::string password);
 
-    std::string getReady();
+    std::string getReady(std::vector<std::shared_ptr<User> >::iterator &user);
 
     bool AddChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name);
 
