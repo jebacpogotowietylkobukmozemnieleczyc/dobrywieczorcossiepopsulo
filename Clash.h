@@ -34,7 +34,8 @@ public:
     void IncreaseTurn();
     std::string LoadData();
     bool CheckTurn(int userTurn);
-    bool IsExist(const std::shared_ptr<User> &user) const;
+    bool CheckUser(const std::shared_ptr<User> &user) const;
+    bool CheckUsers(const std::shared_ptr<User> &user,const std::shared_ptr<User> &user2) const;
 
     void ShowName(){
         std::cout << "Clash" << std::endl;

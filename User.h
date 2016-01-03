@@ -75,6 +75,9 @@ public:
     void setClashId(unsigned long clashId) {
         User::clashId = clashId;
     }
+    const std::string &getName() const {
+        return name;
+    }
 
     std::string LoadUser();
 

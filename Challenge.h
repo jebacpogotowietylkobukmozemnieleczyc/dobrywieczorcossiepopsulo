@@ -17,8 +17,6 @@ public:
         users.at(0)=user1;
         users.at(1)=user2;
     }
-private:
-public:
     const std::array<std::shared_ptr<User>, 2> &getUsers() const {
         return users;
     }

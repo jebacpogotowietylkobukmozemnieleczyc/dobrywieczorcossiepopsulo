@@ -1,7 +1,3 @@
-//
-// Created by root on 22.11.15.
-//
-
 #ifndef TEST_NETWORK_H
 #define TEST_NETWORK_H
 
@@ -61,6 +57,8 @@ public:
     Network() : callbackMap({{"si", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { user = Login(x.at(0),x.at(1));if(user!=users.end())return "yes;";return "no;"; }},
                              {"ac", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {AddChallenge(user,x.at(0));return "yes;";}},
                              {"tc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {TakeChallenge(user,x.at(0));return "yes;";}},
+                             {"cc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return CheckChallenge(user);}},
+                             {"fc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if(FindClash(user,x.at(0)))return "yes;";return "no;";}},
                              {"dc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {DeclineChallenge(user,x.at(0));return "yes;";}},
                              {"at", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).Attack((*user),std::stoi(x.at(0)));return "yes;";}},
                              {"sm", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).SetMp((*user),std::stoi(x.at(0)));return "yes;";}},
@@ -96,7 +94,11 @@ public:
 
     void SendChallange();
 
-    bool CheckChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name);
+    bool FindChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name);
+
+    bool FindClash(std::vector<std::shared_ptr<User> >::iterator &user, std::string name);
+
+    std::string CheckChallenge(std::vector<std::shared_ptr<User> >::iterator &user);
 
     void AnswerChallange();
 
