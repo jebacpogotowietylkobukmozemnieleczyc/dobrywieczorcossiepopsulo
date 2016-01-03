@@ -1,7 +1,3 @@
-//
-// Created by root on 22.11.15.
-//
-
 #include "Network.h"
 std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
     std::stringstream ss(s);
@@ -51,6 +47,7 @@ void* Network::ClientLoop(int *arg){
             string+=buffer[0];
         }while(buffer[0]!=';');
 
+        if(x.size()<2)continue;
         std::string fn = x.at(1);
         std::string odp;
         std::vector<decltype(x)::value_type>(x.begin()+2, x.end()).swap(x);

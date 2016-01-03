@@ -71,6 +71,7 @@ public:
                              {"sl", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if((*user)->SellItem(std::stoi(x.at(0)),std::stoi(x.at(1))))return "yes;";return "no;";}},
                              {"ui", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Use(std::stoi(x.at(0)));return "yes;";}},
                              {"di", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if((*user)->DeleteItem(std::stoi(x.at(0))))return "yes;";return "no;";}},
+                             {"as", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if((*user)->AddSkill(std::stoi(x.at(0))))return "yes;";return "no;";}},
                              {"sr", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->setReady();return "yes";}},
                                     {"lu", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return (*user)->LoadUser();}},
                              {"lh", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return (*user)->LoadHave();}},
