@@ -56,7 +56,7 @@ std::string User::LoadUser() {
     return "du:" + name + ":" + std::to_string(level) + ":" + std::to_string(gold) + ":" + std::to_string(skillPoints)
            + ":" + std::to_string(skill[0]) + ":" + std::to_string(skill[1]) + ":" + std::to_string(skill[2]) + ":"
            + std::to_string(skill[3]) + ":" + std::to_string(wins) + ":" + std::to_string(loss) + ":" +
-           std::to_string(exp) + ";";
+           std::to_string(exp) + ":;";
 }
 
 std::string User::LoadHave() {
@@ -65,7 +65,7 @@ std::string User::LoadHave() {
                                         return a.empty() ? std::to_string(b)
                                                          : a + ':' + std::to_string(b);
                                     });
-    return "dh:" + s + ";";
+    return "dh:" + s + ":;";
 }
 
 std::string User::LoadUse() {
@@ -74,7 +74,7 @@ std::string User::LoadUse() {
                                         return a.empty() ? std::to_string(b)
                                                          : a + ':' + std::to_string(b);
                                     });
-    return "di:" + s + ";";
+    return "di:" + s + ":;";
 }
 
 std::string User::LoadInfo() {

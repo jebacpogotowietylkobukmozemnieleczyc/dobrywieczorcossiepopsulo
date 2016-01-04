@@ -22,6 +22,9 @@ void *Network::ClientLoop(int *arg) {
         } while (buffer[0] != ';');
 
         if (x.size() < 2)continue;
+        for (auto it = x.begin();  it != x.end() ; ++ it) {
+            std::cout << *it << std::endl;
+        }
         std::string fn = x.at(1);
         std::string odp;
         std::vector<decltype(x)::value_type>(x.begin() + 2, x.end()).swap(x);
@@ -30,10 +33,7 @@ void *Network::ClientLoop(int *arg) {
             odp = callbackMap.at(fn)(user, x);
         }
         catch (const std::out_of_range &) {
-            std::cout << "" << std::endl;
-        }
-        for (auto it = x.begin();  it != x.end() ; ++ it) {
-            std::cout << *it << std::endl;
+            std::cout << "cos" << std::endl;
         }
         (*user)->Show();
         std::cout << "Size: " << odp  << std::endl;
@@ -103,8 +103,8 @@ std::vector<std::shared_ptr<User> >::iterator Network::Login(std::string name, s
 }
 
 void Network::Initialise() {
-    users.push_back(std::shared_ptr<User>(new User(++userCount, "user", "12345")));
-    users.push_back(std::shared_ptr<User>(new User(++userCount, "user2", "1234")));
+    users.push_back(std::shared_ptr<User>(new User(++userCount, "User", "12345")));
+    users.push_back(std::shared_ptr<User>(new User(++userCount, "User2", "12345")));
 
     users.at(0)->AddItem(0);
     users.at(0)->AddItem(1);
@@ -123,17 +123,17 @@ void Network::Initialise() {
     users.at(1)->Use(1);
     users.at(1)->Use(3);
 
-    users.at(0)->AddSkill(0);
-    users.at(0)->AddSkill(1);
-    users.at(0)->AddSkill(2);
-    users.at(0)->AddSkill(3);
-    users.at(0)->AddSkill(4);
-
-    users.at(1)->AddSkill(0);
-    users.at(1)->AddSkill(1);
-    users.at(1)->AddSkill(2);
-    users.at(1)->AddSkill(3);
-    users.at(1)->AddSkill(4);
+//    users.at(0)->AddSkill(0);
+//    users.at(0)->AddSkill(1);
+//    users.at(0)->AddSkill(2);
+//    users.at(0)->AddSkill(3);
+//    users.at(0)->AddSkill(4);
+//
+//    users.at(1)->AddSkill(0);
+//    users.at(1)->AddSkill(1);
+//    users.at(1)->AddSkill(2);
+//    users.at(1)->AddSkill(3);
+//    users.at(1)->AddSkill(4);
 //
 //    try {
 //        callbackmap.at("lo")(x);
@@ -327,7 +327,7 @@ std::string Network::getReady(std::vector<std::shared_ptr<User> >::iterator &use
                                         return a.empty() ? user->LoadInfo()
                                                          : a + ':' + user->LoadInfo();
                                     });
-    return "dr:" + s + ";";
+    return "dr:" + s + ":;";
 }
 
 bool Network::AddChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name) {
@@ -353,20 +353,19 @@ bool Network::FindChallenge(std::vector<std::shared_ptr<User> >::iterator &user,
     return true;
 }
 
-void Network::TakeChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name) {
-    if (!FindChallenge(user, name))return;
+bool Network::TakeChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name) {
+    if (!FindChallenge(user, name))return false;
     std::cout << "Take Challange" << std::endl;
     auto it = std::find_if(users.begin(), users.end(),
                            [&name](const std::shared_ptr<User> &user) { return user->CheckName(name); });
-    if (it == users.end())return;
-    //todo memory
+    if (it == users.end())return false;
     clashes.push_back(Clash((*it), (*user)));
     unsigned long clashId = clashes.size() - 1;
+    (*user)->setReady();
     (*it)->setClashId(clashId);
     (*user)->setClashId(clashId);
-
     clashes.at(0).ShowName();
-    //todo anserChallange
+    return true;
 }
 
 void Network::DeclineChallenge(std::vector<std::shared_ptr<User> >::iterator &user, std::string name) {
@@ -385,7 +384,7 @@ std::string Network::CheckChallenge(std::vector<std::shared_ptr<User> >::iterato
     auto it = std::find_if(challenges.begin(), challenges.end(),
                            [&user](const Challenge &challenge) { return challenge.getUsers()[1]==(*user); });
     if (it == challenges.end())return "no;";
-    return (it->getUsers()[0])->getName() + ";";
+    return "cc:" + (it->getUsers()[0])->getName() + ":;";
 }
 
 bool Network::FindClash(std::vector<std::shared_ptr<User> >::iterator &user, std::string name) {

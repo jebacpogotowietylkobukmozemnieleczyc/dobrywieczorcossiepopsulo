@@ -14,7 +14,7 @@ void Clash::ActiveTurn(const std::shared_ptr<User> &user) {
 
 std::string Clash::LoadData() {
 //    std::cout << "Hp1: " << hp1 << "Hp2: " << hp2 << "Mp1: " << mp1 <<"Mp2: " << mp2 << std::endl;
-    return  "dc:" + std::to_string(hp1) + ":" + std::to_string(hp2) + ":" + std::to_string(mp1) +":" + std::to_string(mp2) + ";";
+    return  "dc:" + std::to_string(hp1) + ":" + std::to_string(hp2) + ":" + std::to_string(mp1) +":" + std::to_string(mp2) + ":" + users.at(0)->getName() + ":" + users.at(1)->getName() +":;";
 
 }
 
