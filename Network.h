@@ -66,7 +66,7 @@ public:
                              {"ar", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {clashes.at((*user)->getClashId()).ActiveTurn((*user));return "yes:;";}},
                              {"lc", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) { return clashes.at((*user)->getClashId()).LoadData();}},
                              {"ls", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Lose();DeleteClash(user);return "yes:;";}},
-                             {"wn", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Win();DeleteClash(user);return "yes:;";}},
+                             {"wn", [&](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Win();return "yes:;";}},
                              {"lo", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Logout();return "yes:;";}},
                              {"sl", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {if((*user)->SellItem(std::stoi(x.at(0)),std::stoi(x.at(1))))return "yes:;";return "no:;";}},
                              {"ui", [](std::vector<std::shared_ptr<User> >::iterator &user,const std::vector<std::string> &x) {(*user)->Use(std::stoi(x.at(0)));return "yes:;";}},

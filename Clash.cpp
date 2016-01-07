@@ -49,7 +49,7 @@ void Clash::SetMp(const std::shared_ptr<User> &user,int newMp) {
 }
 
 bool Clash::CheckUser(const std::shared_ptr<User> &user) const {
-    return user==users[0];
+    return user==users[0] || user==users[1];
 }
 
 bool Clash::CheckUsers(const std::shared_ptr<User> &user, const std::shared_ptr<User> &user2) const {
