@@ -359,7 +359,7 @@ bool Network::TakeChallenge(std::vector<std::shared_ptr<User> >::iterator &user,
     auto it = std::find_if(users.begin(), users.end(),
                            [&name](const std::shared_ptr<User> &user) { return user->CheckName(name); });
     if (it == users.end())return false;
-    clashes.push_back(Clash((*it), (*user)));
+    clashes.push_back(Clash((*user), (*it)));
     unsigned long clashId = clashes.size() - 1;
     (*user)->setReady();
     (*it)->setClashId(clashId);
@@ -392,7 +392,7 @@ bool Network::FindClash(std::vector<std::shared_ptr<User> >::iterator &user, std
                            [&name](const std::shared_ptr<User> &user) { return user->CheckName(name); });
     if (it == users.end())return false;
     auto it2 = std::find_if(clashes.begin(), clashes.end(),
-                           [&user,&it](const Clash &clash) { return clash.CheckUsers((*user),(*it)); });
+                           [&user,&it](const Clash &clash) { return clash.CheckUsers((*it),(*user)); });
     if (it2 == clashes.end())return false;
     return true;
 }
