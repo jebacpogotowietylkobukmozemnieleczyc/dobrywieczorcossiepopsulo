@@ -50,6 +50,7 @@ void User::Win() {
         skillPoints += 5;
         exp = 0;
     }
+    clashId=-1;
 }
 
 std::string User::LoadUser() {
@@ -79,4 +80,8 @@ std::string User::LoadUse() {
 
 std::string User::LoadInfo() {
     return name + ":" + std::to_string(level) + ":" + std::to_string(wins) + ":" + std::to_string(loss);
+}
+
+bool User::CheckClash(unsigned long clash) {
+    return clash==clashId;
 }

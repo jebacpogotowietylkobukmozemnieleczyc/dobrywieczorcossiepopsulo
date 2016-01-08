@@ -10,7 +10,7 @@ public:
     User(int id, const std::string &name, const std::string &password) : id(id), name(name), password(password),
                                                                          gold(100), wins(0),
                                                                          loss(0), exp(0), level(1), skillPoints(5),
-                                                                         logged(false), ready(false) {
+                                                                         logged(false), ready(false){
         skill[0] = 1;
         skill[1] = 1;
         skill[2] = 1;
@@ -22,6 +22,7 @@ public:
     void AddItem(int id);
 
     void Use(int);
+    bool CheckClash(unsigned long clash);
 
     bool DeleteItem(int id);
 
@@ -41,7 +42,7 @@ public:
 
     void Win();
 
-    void Lose() { ++loss; }
+    void Lose() { ++loss; clashId=-1;}
 
     //Additional
     void Show() { std::cout << name << " " << password << std::endl; }

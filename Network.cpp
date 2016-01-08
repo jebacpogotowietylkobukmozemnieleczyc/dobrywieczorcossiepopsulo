@@ -374,6 +374,9 @@ void Network::DeclineChallenge(std::vector<std::shared_ptr<User> >::iterator &us
 }
 
 void Network::DeleteClash(std::vector<std::shared_ptr<User> >::iterator &user) {
+    long part = std::count_if(users.begin(),users.end(),[&user](const std::shared_ptr<User> &user2){ return user2->CheckClash((*user)->getClashId());});
+    if(part!=1)
+        return;
     clashes.erase(
             std::remove_if(clashes.begin(), clashes.end(),
                            [&user](const Clash &clash) { return clash.CheckUser((*user)); }),
