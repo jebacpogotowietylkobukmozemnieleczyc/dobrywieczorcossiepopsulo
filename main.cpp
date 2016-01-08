@@ -1,13 +1,8 @@
 #include "Network.h"
-int main(int argc, char* argv[])
-{
 
-//    char buffer[50] = "ecos:cos:sin::";
-//
-//    std::vector<std::string> x = split(buffer, ':');
-
+int main(int argc, char *argv[]) {
     Network network;
-   network.Initialise();
+    network.Initialise();
     network.SetServer(argv);
-    return(0);
+    return (0);
 }
