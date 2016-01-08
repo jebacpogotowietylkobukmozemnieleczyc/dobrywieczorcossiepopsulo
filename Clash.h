@@ -33,7 +33,8 @@ public:
     void SetMp(const std::shared_ptr<User> &user,int newMp);
     void IncreaseTurn();
     std::string LoadData();
-    bool CheckTurn(int userTurn);
+    bool CheckTurn(const std::shared_ptr<User> &user);
+    bool CheckRound(int round);
     bool CheckUser(const std::shared_ptr<User> &user) const;
     bool CheckUsers(const std::shared_ptr<User> &user,const std::shared_ptr<User> &user2) const;
 

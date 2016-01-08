@@ -18,8 +18,13 @@ std::string Clash::LoadData() {
 
 }
 
-bool Clash::CheckTurn(int userTurn) {
-    if(turnCount>userTurn)return true;
+bool Clash::CheckTurn(const std::shared_ptr<User> &user) {
+    if(user==users[0]){
+        return turn[1];
+    }
+    else if(user==users[1]){
+        return turn[0];
+    }
     return false;
 }
 
@@ -54,4 +59,8 @@ bool Clash::CheckUser(const std::shared_ptr<User> &user) const {
 
 bool Clash::CheckUsers(const std::shared_ptr<User> &user, const std::shared_ptr<User> &user2) const {
     return user==users[0] && user2==users[1];
+}
+
+bool Clash::CheckRound(int round) {
+    return turnCount>round;
 }
